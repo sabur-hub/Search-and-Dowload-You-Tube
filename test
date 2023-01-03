@@ -1,0 +1,58 @@
+
+from aiogram import *
+from config import bot_token
+# from pytube import YouTube
+
+bot = Bot(bot_token)
+dp = Dispatcher(bot)
+
+
+@dp.message_handler(commands=["start"])
+async def startmessage(message: types.Message):
+    chat_id = message.chat.id
+    await bot.send_message(chat_id, "hi i can download video with youtube\n you can send me link with video")
+
+
+if __name__ == '__main__':
+    executor.start_polling(dp)
+@dp.message_handler()
+async def textMessage(message: types.Message):
+    chat_id = message.chat.id
+    url = message.text
+    yt = YouTube(url)
+    if message.text.startswith == 'https://www.youtube.com/' or 'https://youtu.be/':
+        await bot.send_message(chat_id, f"Start dowloding: {yt.title}\n with this blog : [{yt.author}]({yt.channel_url}"
+                               , parse_mode="Markdown")
+        await dlVideo(url, message, bot)
+    else:
+        print('Your link not correct')
+
+
+async def dlVideo(url, message, bot):
+    yt = YouTube(url)
+    stream = yt.streams.filter(progressive=True, file_extension="mp4")
+    stream.get_highest_resolution().download(f'{message.chat.id}', f'{message.chat.id}_{yt.title}')
+    with open(f"{message.chat.id}/{message.chat.id}_{yt.title}", 'rb') as video:
+        await bot.send_video(message.chat.id, video, caption="this is your video", parse_mode='Markdown')
+        os.remove(f"{message.chat.id}/{message.chat.id}_{yt.title}")
+
+
+# import os
+import requests
+from bs4 import BeautifulSoup
+import re
+
+
+def search():
+    response = requests.get('https://www.youtube.com/results?search_query=python')
+    soup = BeautifulSoup(response.content, 'html.parser')
+    searcher = soup.find_all('script')[32]
+    key = '"videoId":"'
+    data = re.findall(key + r"([^*]{11})", str(searcher))
+    print(data)
+
+
+search()
+
+    with open('text.py', 'w', encoding='utf-8') as r:
+        r.write(str(res))
